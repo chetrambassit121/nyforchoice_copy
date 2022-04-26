@@ -1,0 +1,535 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+
+  <div class="row mt-5">
+    <div class="col-md-3 col-sm-6">
+      <a href="{% url 'post-list' %}" class="btn btn-light">Back to Posts</a>
+    </div>
+  </div>
+
+  
+  <div class="row justify-content-center mt-5" style="background-color: #223a5e;">
+    <div class="col-md-8 col-sm-12 border px-5 pt-3">
+      <div class="text-center">
+        <h1 class="row justify-content-center mt-3">User Profile</h1> 
+        <h5>{{ profile }}</h5>  
+        <h6>
+
+
+          <a href="{% url 'list-followers' profile.pk %}" class="post-link">Followers: {{ number_of_followers }}</a>&nbsp;&nbsp; 
+          <a href="{% url 'list-followings' profile.pk %}" class="post-link">Following: {{ number_of_followings }}</a>&nbsp;&nbsp;
+          <!-- <a href="#" class="post-link">Following: {{ number_of_followings }}</a>&nbsp;&nbsp; -->
+
+
+        <!--   <b> following : </b>
+          <p class="text-muted"> {{ author.following.count }} </p>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <b> followers : </b>
+          <p class="text-muted"> {{ author.followers.count }} </p> -->
+
+
+         <!--  <div class="level-item has-text-centered">
+            <div>
+              <p class="heading">Following</p>
+              <a href="{ url 'list-followings' profile.pk %}"><p class="title">{{ following_count }}</p></a>
+            </div>
+          </div>
+          <div class="level-item has-text-centered">
+            <div>
+              <p class="heading">Followers</p>
+              <p class="title">{{ followers_count }}</p>
+            </div>
+          </div> -->
+
+
+          {% if request.user == user %}
+            <a href="{% url 'edit_profile_page' request.user.profile.pk %}">Edit Profile Page</a> &nbsp;&nbsp; 
+            <a href="{% url 'edit_profile' request.user.profile.pk %}">Edit User Settings</a>
+            <p>Date Joined: {{ user.date_joined }}</p>
+          {% endif %}
+        </h6>
+      </div>
+      <div class="text-center">
+        {% if profile.picture %}
+          <img src="{{ profile.picture.url }}" class="rounded-circle" width="100" height="100">
+        {% else %}
+          <img src="{% static 'operationfreedom/images/profile_pictures/default_pic.jpg' %}" class="rounded-circle" width="100" height="100">
+        {% endif %}
+      </div>
+      <!-- <div class="col-md-10"> -->
+        <div class="card-body">
+          <div class="text-center">
+            <h5 class="card-title">{% if profile.first_name %}{{ profile.first_name }}{% endif %} {% if profile.last_name %}{{ profile.last_name }}{% endif %} </h5>
+            <p class="small text-muted">
+            	{% if profile.website_url %}
+            		<a target="_blank" href="{{ profile.website_url }}">Website</a>  
+            	{% endif %}
+            	{% if profile.facebook_url %}
+            		| <a target="_blank" href="{{ profile.facebook_url }}">Facebook</a> 
+            	{% endif %}
+            	{% if profile.twitter_url %} 
+            		| <a target="_blank" href="{{ profile.twitter_url }}">Twitter</a> 
+            	{% endif %}
+            	{% if profile.instagram_url %} 
+            		| <a target="_blank" href="{{ profile.instagram_url }}">Instagram</a> 
+            	{% endif %}
+            	{% if profile.pinterest_url %} 
+            		| <a target="_blank" href="{{ profile.pinterest_url }}">Pinterest</a> 
+            	{% endif %}
+              <br>
+              {% if profile.location %}
+              <p>Location: {{ profile.location }}</p>
+              {% endif %}
+
+              {% if profile.birth_date %}
+              <p>Birthday: {{ profile.birth_date }}</p>
+              {% endif %}
+
+              {% if user == request.user %}
+              {% else %}
+                {% if is_following %}
+                  <form method="POST" action="{% url 'remove-follower' profile.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger" type="submit">Unfollow</button>
+                  </form>
+                {% else %}
+                  <form method="POST" action="{% url 'add-follower' profile.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-success" type="submit">Follow</button>
+                  </form>
+                {% endif %}
+              {% endif %}
+
+
+           <!--    {if user == request.user %}
+              { else %}
+                { if user in author.following.all %}
+                  <a href="{ url 'followToggle' author=author.user.pk  %}" class="btn btn-primary">Unfollow</a>
+                { else %}
+                  <a href="{ url 'followToggle' author=author.user.pk  %}" class="btn btn-primary"> Follow </a>
+                { endif %}
+              { endif %} -->
+
+             <!--  { if user == request.user %}
+              { else %}
+                <div class="media-right">
+                  { if follow_status == True %}
+                    <a href="{ url 'follow' profile.user 0 %}" class="button is-danger">Unfollow</a>
+                  { else %}
+                    <a href="{ url 'follow' profile.user 1 %}" class="button is-success">Follow</a>
+                  { endif  %}
+                </div>
+              { endif %} -->
+
+
+
+            </p>	
+            <p class="card-text">{{ profile.bio }}</p>
+            <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+          </div>
+        </div>
+      <!-- </div> -->
+    </div>
+  </div>
+  <div class="row justify-content-center mt-3 mb-5"><div class="col-md-5 col-sm-12"><div class="flexbox-item-99"><div class="header-info2">
+    <h2>{{ user.username }} Posts</h2>
+    <h4><a href="{% url 'show_shared_profile_page' user.profile.pk %}">{{ user.username }} Shared Posts</a></h4>
+    <h5>Click on a Post to View Comments!</h5>
+  </div></div></div></div>
+  <div class="infinite-container">
+  {% for post in posts %}
+    <div class="infinite-item">
+      <div class="row justify-content-center mt-3">
+        <div class="col-md-5 col-sm-12 border-bottom position-relative">
+          {% if post.shared_user %}
+            <div>
+              <a href="{% url 'show_profile_page' post.shared_user.profile.pk %}">
+                  <img class="round-circle post-img" height="45" width="45" src="{{ post.shared_user.profile.picture.url }}" />
+              </a>
+              <p class="post-text">
+                  <a class="text-primary post-link" href="{% url 'show_profile_page' post.shared_user.profile.pk %}">@{{ post.shared_user }}</a> shared a post on {{ post.created_on }}
+              </p>
+            </div>
+          {% else %}
+            <div>
+              <a href="{% url 'show_profile_page' post.author.profile.pk %}">
+                  <img class="round-circle post-img" height="45" width="45" src="{{ post.author.profile.picture.url }}" />
+              </a>
+              <p class="post-text">
+                  <a class="text-primary post-link" href="{% url 'show_profile_page' post.author.profile.pk %}">@{{ post.author }}</a> {{ post.created_on }}
+                  
+              </p>
+            </div>
+          {% endif %}
+          {% if post.shared_body %}
+            <div class="position-relative mb-3 body">
+                <p>{{ post.shared_body }}</p>
+                <a href="{% url 'post-detail' post.pk %}" class="stretched-link"></a>
+            </div>
+            <div class="shared-post">
+              <a href="{% url 'show_profile_page' post.author.profile.pk %}">
+                  <img class="round-circle post-img" height="45" width="45" src="{{ post.author.profile.picture.url }}" />
+              </a>
+              <p class="post-text">
+                  <a class="text-primary post-link" href="{% url 'show_profile_page' post.author.profile.pk %}">@{{ post.author }}</a> {{ post.shared_on }}
+              </p>
+            </div>
+          {% endif %}
+          <div class="shared-post position-relative pt-3">
+            <div class="position-relative">
+              <div class="body">
+                <p>{{ post.body }}</p>
+              </div>
+              {% if post.image %}
+                <img src="{{ post.image.url }}" class="post-image"/>
+              {% endif %}
+              <a href="{% url 'post-detail' post.pk %}" class="stretched-link"></a>
+            </div>
+          </div>
+
+
+          <div class="d-flex flex-row">
+            <form method="POST" action="{% url 'profile-like' profile.pk post.id   %}" class="like-form" id="{{post.id}}">
+              {% csrf_token %}
+              {% if request.user not in post.likes.all %}
+                <input type="hidden"  name="post_id" value="{{ post.id }}">
+                <button class="remove-default-btn like-btn{{post.id}}" type="submit">
+                    <i class="far fa-thumbs-up like-icon{{post.id}}"  style="color: white"><span class="like_count{{post.id}}">{{ post.likes.all.count }}</span></i>
+                </button>
+              {% else %}
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <button class="remove-default-btn like-btn{{post.id}}" type="submit">
+                    <i class="far fa-thumbs-up like-icon{{post.id}} btn-success"  style="color: white"><span class="like_count{{post.id}}">{{ post.likes.all.count }}</span></i>
+                </button>
+              {% endif %}
+            </form>
+            
+            <form method="POST" action="{% url 'profile-dislike' profile.pk post.id  %}" class="dislike-form" id='{{post.id}}'>
+              {% csrf_token %}
+              {% if request.user not in post.dislikes.all %}
+                  <input type="hidden" name="post_id" value="{{ post.id }}">
+                  <button class="remove-default-btn dislike-btn{{post.id}}" type="submit" >
+                      <i class="far fa-thumbs-down dislike-icon{{post.id}}"  style="color: white"> <span class="dislike_count{{post.id}}">{{ post.dislikes.all.count }}</span></i>
+                  </button>
+              {% else %}
+                  <input type="hidden" name="post_id" value="{{ post.id }}">
+                  <button class="remove-default-btn dislike-btn{{post.id}}" type="submit" >
+                      <i class="far fa-thumbs-down dislike-icon{{post.id}} btn-success"  style="color: white"> <span class="dislike_count{{post.id}}">{{ post.dislikes.all.count }}</span></i>
+                  </button>
+              {% endif %}
+            </form>
+
+            <p>Comments: {{ comment.count }}</p>
+          </div>
+
+
+
+
+        
+
+
+
+
+
+       <!--    <div class="d-flex flex-row">
+
+            <form method="POST" action="{ url 'profile-like' post.pk %}">
+              { csrf_token %}
+              { if request.user not in post.likes.all %}
+                <input type="hidden"  name="next" value="{{ request.path }}">
+                <button class="remove-default-btn like-btn" type="submit">
+                  <i class="far fa-thumbs-up like-icon"  style="color: white"><span class="like_count">{{ post.likes.all.count }}</span></i>
+                </button>
+              { else %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn like-btn" type="submit">
+                  <i class="far fa-thumbs-up like-icon btn-success"  style="color: white"><span class="like_count">{{ post.likes.all.count }}</span></i>
+                </button>
+              { endif %}
+            
+            </form>
+
+            <form method="POST" action="{ url 'profile-dislike' post.pk %}">
+              { csrf_token %}
+              { if request.user not in post.dislikes.all %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn dislike-btn" type="submit">
+                  <i class="far fa-thumbs-down dislike-icon" style="color: white"><span class="dislike_count">{{ post.dislikes.all.count }}</span></i>
+                </button>
+              { else %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn dislike-btn" type="submit">
+                  <i class="far fa-thumbs-down dislike-icon btn-success" style="color: white"><span class="dislike_count">{{ post.dislikes.all.count }}</span></i>
+                </button>
+              { endif %}
+           
+            </form>
+
+          </div>
+ -->
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+  <div class="row justify-content-center mt-3">
+    <div class="col-md-5 col-sm-12 position-relative">
+      {% if posts.has_previous %}
+        <a href="?page=1">&laquo First</a>
+        <a href="?page={{ posts.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      Page {{ posts.number }} of {{ posts.paginator.num_pages }}
+
+      {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}">Next</a>
+        <a href="?page={{ posts.paginator.num_pages }}">Last &raquo</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    //like ajax call
+    $('.like-form').submit(function(e){
+      e.preventDefault();
+      // const post_id=$(`.like-btn${post_id}`).val();
+      // const post_id=$('.like-btn').val();
+
+      const post_id=$(this).attr('id')
+      const likeText = $(`.like-btn${post_id}`).text()
+      const trim = $.trim(likeText)
+      const url=$(this).attr('action') 
+      let res;
+      const like = $(`.like_count${post_id}`).text()
+      // const trimCount = parseInt(like)
+      // const token=$('input[name=csrfmiddlewaretoken]').val();
+      $.ajax({
+        method:"POST",
+        url:url,
+        // headers:{'X-CSRFToken': token},
+        data:{
+          'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+          // 'profile':profile,
+          'post_id':post_id,
+        },
+        success:function(response){
+          if(response.liked===true){
+            $(`.like-icon${post_id}`).addClass('btn-success')
+          }else{
+            $(`.like-icon${post_id}`).removeClass('btn-success')
+          }
+          if(response.disliked===true){
+            $(`.dislike-icon${post_id}`).addClass("btn-success")
+          }else{
+            $(`.dislike-icon${post_id}`).removeClass("btn-success")
+          }
+          likes=$(`.like_count${post_id}`).text(response.likes_count)
+          parseInt(likes)
+          dislikes=$(`.dislike_count${post_id}`).text(response.dislikes_count)
+          parseInt(dislikes)
+        },
+        error:function(response){
+          console.log("Failed ", response)
+        }
+      })
+    });
+
+
+    //dislike ajax call
+
+    $('.dislike-form').submit(function(e){
+      e.preventDefault();
+      // const post_id=$(".dislike-btn").val();
+      const token=$('input[name=csrfmiddlewaretoken]').val();
+      const post_id = $(this).attr('id')
+      const dislikeText = $(`.dislike-btn${post_id}`).text()
+      const trim = $.trim(dislikeText)
+      const url =$(this).attr('action') 
+      let res;
+      const dislike = $(`.dislike_count${post_id}`).text()
+      const trimCount = parseInt(dislike)
+      $.ajax({
+        method:"POST",
+        url:url,
+        // headers:{"X-CSRFToken": token},
+        data:{
+          'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+          // 'profile':profile,
+          'post_id':post_id,
+        },
+        success:function(response){
+          if(response.disliked===true){
+            $(`.dislike-icon${post_id}`).addClass("btn-success")
+          }else{
+            $(`.dislike-icon${post_id}`).removeClass("btn-success")
+          }
+
+          if(response.liked===true){
+            $(`.like-icon${post_id}`).addClass('btn-success')
+          }else{
+            $(`.like-icon${post_id}`).removeClass('btn-success')
+          }
+          likes=$(`.like_count${post_id}`).text(response.likes_count)
+          parseInt(likes)
+          dislikes=$(`.dislike_count${post_id}`).text(response.dislikes_count)
+          parseInt(dislikes)
+        },
+        error:function(response){
+          console.log('failed', response)
+        }
+      }) 
+    });
+
+  });
+</script>
+
+
+
+
+
+
+
+  
+
+
+ 
+
+
+{% endblock %}
+
+<!-- THIS IS DATA FOR PAGINATOR NOT NEEDED  -->
+{{ posts }}<br>
+  Has Previous: {{ posts.has_previous }}<br>
+  Has Next: {{ posts.has_next }}<br>
+  Current Page: {{ posts.number }}<br>
+  Number of Pages: {{ posts.paginator.num_pages }}
+  <hr><br><br>
+
+
+<!-- INFINITE SCROLL CODING -->
+ <!--  <div class="row justify-content-center mt-3 mb-5">
+    <div class="col-md-5 col-sm-12">
+        { if posts.has_next %}
+          <a class="infinite-more-link" href="?page={{ posts.next_page_number }}"></a>
+        { endif %}
+    </div>
+  </div>
+  { if posts %}
+  <div class="d-flex justify-content-center" style="display:none;">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  { endif %} -->
+
+
+
+
+
+
+
+          <div class="d-flex flex-row">
+            <form method="POST" action="{% url 'profile-like' post.id %}" class="like-form" id="{{post.id}}">
+                {% csrf_token %}
+                {% if request.user not in post.likes.all %}
+                    <input type="hidden"  name="post_id" value="{{ post.id }}">
+                    <button class="remove-default-btn like-btn{{post.id}}" type="submit">
+                        <i class="far fa-thumbs-up like-icon{{post.id}}"  style="color: white"><span class="like_count{{post.id}}">{{ post.likes.all.count }}</span></i>
+                    </button>
+                {% else %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <button class="remove-default-btn like-btn{{post.id}}" type="submit">
+                        <i class="far fa-thumbs-up like-icon{{post.id}} btn-success"  style="color: white"><span class="like_count{{post.id}}">{{ post.likes.all.count }}</span></i>
+                    </button>
+                {% endif %}
+            </form>
+            
+            <form method="POST" action="{% url 'profile-dislike' post.id %}" class="dislike-form" id='{{post.id}}'>
+                {% csrf_token %}
+                {% if request.user not in post.dislikes.all %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <button class="remove-default-btn dislike-btn{{post.id}}" type="submit" >
+                        <i class="far fa-thumbs-down dislike-icon{{post.id}}"  style="color: white"> <span class="dislike_count{{post.id}}">{{ post.dislikes.all.count }}</span></i>
+                    </button>
+                {% else %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <button class="remove-default-btn dislike-btn{{post.id}}" type="submit" >
+                        <i class="far fa-thumbs-down dislike-icon{{post.id}} btn-success"  style="color: white"> <span class="dislike_count{{post.id}}">{{ post.dislikes.all.count }}</span></i>
+                    </button>
+                {% endif %}
+            </form>
+
+            <p>Comments: {{ comment.count }}</p>
+          </div>
+
+
+
+ <div class="d-flex flex-row">
+            <form method="POST" action="{% url 'like' post.pk %}">
+              {% csrf_token %}
+              {% if request.user not in post.likes.all %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn" type="submit">
+                  <i class="far fa-thumbs-up" style="color: white"><span>{{ post.likes.all.count }}</span></i>
+                </button>
+              {% else %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn" type="submit">
+                  <i class="far fa-thumbs-up btn-success" style="color: white;"><span>{{ post.likes.all.count }}</span></i>
+                </button>
+              {% endif %}
+            </form>
+            <form method="POST" action="{% url 'dislike' post.pk %}">
+              {% csrf_token %}
+              {% if request.user not in post.dislikes.all %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn" type="submit">
+                  <i class="far fa-thumbs-down" style="color: white"> <span>{{ post.dislikes.all.count }}</span></i>
+                </button>
+              {% else %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="remove-default-btn" type="submit">
+                  <i class="far fa-thumbs-down btn-success" style="color: white"> <span>{{ post.dislikes.all.count }}</span></i>
+                </button>
+              {% endif %}
+            </form>
+          </div>
+
+
+
+
+ <div class="content" id="profile-post-container">
+          
+  </div>
+  <div class="load-img" id="profile-more-data">
+      
+  </div>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
