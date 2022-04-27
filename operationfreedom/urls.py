@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf.urls import url 
-from .views import HomeView, AboutView, SurveyView
+from .views import HomeView, AboutView, SurveyView, like, dislike 
 
 from . import views
 # SurveyCommentView
