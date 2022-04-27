@@ -12,21 +12,8 @@
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>   
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'the_plan' %}">The Plan</a>
-            </li> 
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'promote_the_petitions' %}">Promote the Petitions</a>
-            </li>  
-            <li class="nav-item">
               <a class="nav-link" href="{% url 'surveys' %}">Surveys</a>
             </li>     
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'executive_orders' %}">Executive Orders</a>
-            </li>    
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'vaccine_percentages' %}">Vaccine Percentages</a>
-            </li>  
-            <li class="nav-item">
               <a class="nav-link" href="{% url 'post-list' %}">Posts</a>
             </li> 
             {% if user.is_authenticated %}
