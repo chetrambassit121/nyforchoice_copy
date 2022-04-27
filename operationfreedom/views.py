@@ -15,22 +15,14 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 def HomeView(request):
 	return render(request, 'home.html')
 
-
-
-def PromotePetitionsView(request):
-	return render(request, 'promote_the_petitions.html')
-
 def AboutView(request):
 	return render(request, 'about.html')
 
-def vaccine_percentages(request):
-	return render(request, 'vaccine_percentages.html')
-
-def executive_orders(request):
-  return render(request, 'executive_orders.html')
-
-def the_plan(request):
-	return render(request, 'the_plan.html')
+def SurveyView(request):
+  survey = Survey.objects.all()
+  # survey_general = Survey_General.objects.all()
+  return render(request, 'surveys.html', {'survey':survey})
+  # 'survey_general': survey_general
 
 # @login_required
 def like(request, id):
@@ -109,11 +101,7 @@ def dislike(request, id):
   return redirect(reverse("surveys", args=[str(id)]))
 
 
-def SurveyView(request):
-  survey = Survey.objects.all()
-  # survey_general = Survey_General.objects.all()
-  return render(request, 'surveys.html', {'survey':survey})
-  # 'survey_general': survey_general
+
 
 
 
