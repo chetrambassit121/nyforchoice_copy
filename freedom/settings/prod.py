@@ -6,7 +6,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nyforchoice-copy.herokuapp.com', 'localhost'] 
+ALLOWED_HOSTS = ['nyforchoice-social.herokuapp.com', 'localhost'] 
 
 # HTTPS settings
 SESSION_COOKIE_SECURE = True
