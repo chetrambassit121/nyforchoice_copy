@@ -49,9 +49,9 @@ body {
 }
 
 .flexbox-item-99 {
-  border: 5px solid #F8F8FF;
+  /* border: 5px solid #F8F8FF; */
   text-align: center;
-	margin: 10px;
+  margin: 10px;
 }
 
 .flexbox-item-98 h2 {
@@ -332,7 +332,7 @@ body {
 	position: absolute;
 	background-color: #f1f1f1;
 	min-width: 225px;
-	box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2)
+	box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
 	z-index: 1;
 	font-size: 0.9rem;
 }
